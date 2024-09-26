@@ -1,0 +1,1534 @@
+The backend APIs could be divided into following categories
+    A) Master Config APIs
+        A.1) User Master 
+        A.2) Tenant Master
+        A.3) Git Master
+        A.4) UFM Profile
+
+    B) Test Connection
+        B.1) Tenant Check Connection
+        B.2) Git Check Connection
+    
+    C) Taxonomy
+        C.1) Type
+
+    D) User Credentials
+        D.1) Get All User Credentials
+        D.2) Copy all User Credentials
+    
+    E) Global Variables
+        E.1) Get All Global Variables
+        E.2) Copy All Global Variables
+    
+    F) OAuth2 Client Credentials
+        F.1)  Get All Outh2 Client Credentials List
+        F.2)  Copy All OAuth2 Client Credentials
+
+    G) Keystore and Certificates
+        G.1) Get All Keystore For Tenants
+        G.2) Copy Certificates 
+    
+    H) Number Ranges
+        H.1) Get All Number Ranges 
+        H.2) Copy Number Ranges
+
+    I) Packages and Artifacts
+        I.1) List All Packages with Artifacts
+        I.2) Copy Packages and Artifacts
+        I.3) Copy Configurations
+
+    J) Failover
+        I.1) Schedule a planned/unplanned Failover (or Switchback)
+        I.2) Get status of Planned/Unplanned Failover (or Switchback)
+        
+--------------------------------------------------------------------------
+
+A) Master Config APIs
+
+    A.1) User Master
+        I) Create User
+            -> Description: Creates a user record. Once a user is logged in for the first time, a record is created in User Master table (user). If the user record already exists, it is only updated in the user master table (user), for instance the last logged on time is updated upon a call to this API from Front End (FE).
+            -> SAP APIs Invoked: None
+            -> Endpoint: /firebird/userMaster
+            Method: POST
+            Payload: { 
+                "email_id": "dbc@example.com",
+                "first_name": "dbc",
+                "last_name": "bravo",
+                "display_name": "dbc bravo",
+                "external_id": "EX2344",
+                "additional_param1": null,
+                "created_by": 1,
+                "modified_by": 2,
+                "is_active": true,
+                "is_admin": true,
+                "role": "Admin",
+                "timezone_id": 72004
+            }
+
+            Output: {
+                "user_id": 8,
+                "email_id": "dbc@example.com",
+                "first_name": "dbc",
+                "last_name": "bravo",
+                "display_name": "dbc bravo",
+                "external_id": "EX2344",
+                "additional_param1": null,
+                "created_on": "1721308844",
+                "created_by": "1",
+                "modified_on": "1721717553",
+                "modified_by": "2",
+                "is_active": true,
+                "is_admin": true,
+                "first_logged_on": "1721308844",
+                "last_logged_on": "1721717553",
+                "role": "Admin",
+                "timezone_id": 72004
+            } 
+            If the user is already created:  status = 200 ( record is updated )
+            If the user record is newly created: status = 201 
+
+        II) Get All Users List 
+            -> Description: Provides a list of all the User records in User Master table.
+            -> Endpoint: /firebird/userMaster,
+            -> SAP APIs Invoked: None
+            -> Method: GET
+            -> Payload: None
+            -> Output: {
+        "success": true,
+        "statusCode": 200,
+        "type": "RecordFound",
+        "message": "A list of user master records",
+        "data": [
+                {
+                    "user_id": 9,
+                    "email_id": "djdc@example.com",
+                    "first_name": "dmd",
+                    "last_name": "bravo",
+                    "display_name": "dbc bravo",
+                    "external_id": "EX234M",
+                    "additional_param1": null,
+                    "created_on": "1721717664",
+                    "created_by": "1",
+                    "modified_on": "1721717664",
+                    "modified_by": "2",
+                    "is_active": true,
+                    "is_admin": true,
+                    "first_logged_on": "1721717664",
+                    "last_logged_on": "1721717664",
+                    "role": "Admin",
+                    "timezone_id": 72004,
+                    "timezone": {
+                        "taxonomy_id": 72004,
+                        "taxonomy_code": "US/Alaska_Alaska",
+                        "taxonomy_name": "US/Alaska - Alaska (UTC-09:00)",
+                        "taxonomy_value": "(UTC-09:00)",
+                        "taxonomy_type": "TIMEZONE_LIST"
+                    }
+                }
+                ... other user items ...
+            ]
+        }
+
+
+        III) Get User by Id
+            -> Description: Provides a list of all the User records in User Master table.
+            -> Endpoint: /firebird/userMaster/:id
+            -> SAP APIs Invoked: None
+            -> Method: GET
+            -> Payload: 
+                Param: id  // is the user_id
+                -> Output: {
+            "success": true,
+            "statusCode": 200,
+            "type": "RecordFound",
+            "message": "User Master record for id :2",
+            "data": {
+                "user_id": 2,
+                "email_id": "dbc@example.com",
+                "first_name": "dbc",
+                "last_name": "bravo",
+                "display_name": "dbc bravo",
+                "external_id": "EX2343",
+                "additional_param1": null,
+                "created_on": "1717158250",
+                "created_by": "1",
+                "modified_on": "1721384592",
+                "modified_by": "2",
+                "is_active": true,
+                "is_admin": true,
+                "first_logged_on": "1717158250",
+                "last_logged_on": "1719922301",
+                "role": "Admin",
+                "timezone_id": 72006,
+                "timezone": {
+                    "taxonomy_id": 72006,
+                    "taxonomy_code": "America/Tijuana_Tijuana",
+                    "taxonomy_name": "America/Tijuana - Tijuana (UTC-08:00)",
+                    "taxonomy_value": "(UTC-08:00)",
+                    "taxonomy_type": "TIMEZONE_LIST"
+                }
+            }
+        }
+
+        IV) Update User
+            -> Description: Update a User Master record
+            -> Endpoint: /firebird/userMaster
+            -> SAP APIs Invoked: None
+            -> Method: PUT
+            -> Payload: {
+            "user_id": 2,
+            "email_id": "dbc@example.com",
+            "first_name": "dbc",
+            "last_name": "bravo",
+            "display_name": "dbc bravo",
+            "external_id": "EX2343",
+            "additional_param1": null,
+            "created_by": 1,
+            "modified_by": 2,
+            "is_active": true,
+            "is_admin": true,
+            "role": "Admin",
+            "timezone_id": 72006
+        }
+            -> Output: {
+            "user_id": 2,
+            "email_id": "dbc@example.com",
+            "first_name": "dbc",
+            "last_name": "bravo",
+            "display_name": "dbc bravo",
+            "external_id": "EX2343",
+            "additional_param1": null,
+            "created_on": "1717158250",
+            "created_by": 1,
+            "modified_on": 1721821371,
+            "modified_by": 2,
+            "is_active": true,
+            "is_admin": true,
+            "first_logged_on": "1717158250",
+            "last_logged_on": "1719922301",
+            "role": "Admin",
+            "timezone_id": 72006
+        }
+
+    A.2) Tenant Master
+        I) Get All Tenants List
+            -> Description: Provides a list of all the tenant records from Tenant Master table.
+            -> Endpoint: /firebird/userMaster/:id
+            -> SAP APIs Invoked: None
+            -> Method: GET
+            -> Payload: 
+                Param: id  // is the user_id
+            -> Output: {
+            "success": true,
+            "statusCode": 200,
+            "type": "RecordFound",
+            "message": "A list of tenant records",
+            "data": [
+                {
+                    "tenant_id": 2,
+                    "tenant_name": "Tenant QA 2",
+                    "tenant_description": "PG QA Tenant 2",
+                    "tenant_region_id": null,
+                    "tenant_host_url": "https://pgisqa2.it-cpi009.cfapps.us20.hana.ondemand.com",
+                    "tenant_host_token_api": "https://pgisqa2.authentication.us20.hana.ondemand.com/oauth/token",
+                    "tenant_iflow_host_url": null,
+                    "tenant_host_username": "sb-08c908ac-89f8-4ce2-918a-2f93e2da4f35!b12346|it!b34",
+                    "tenant_host_test_status_id": 13002,
+                    "tenant_host_test_status_on": "1722243835",
+                    "tenant_util_host_url": "https://pgisqa2.it-cpi009-rt.cfapps.us20.hana.ondemand.com",
+                    "tenant_util_token_url": "https://pgisqa2.authentication.us20.hana.ondemand.com/oauth/token",
+                    "tenant_util_client_id": "sb-c25c9405-8c9b-4224-b651-d32d3f7225b4!b12346|it-rt-pgisqa2!b34",
+                    "tenant_util_client_secret": "NDg1ODA4YTAyMzY0MWRkY2ZlMjhkNDM2MTJhZjU2NzE4MWVhZTVlOWVjYWQxOWRlYTkxOTBkN2VlNDM4NjM0NmNhYjczY2RhNTc1MjNhMGE2YTE0N2M1YWRiMWY0NzBjNTMwMGNlYmVkYTYxMjM1ZjA2NGY0NzljMTA1NWM0ZmVkY2Y1MGQ2YjZlZDhlOGYyYjBkM2JhODI2ZjBhMjVlNzNmZDVkODYxMTZlNWM5NmQ3ZWQ4Njc3MTg3NmEzODYx",
+                    "tenant_util_iv_salt": "TEMPORARY",
+                    "tenant_environment_id": null,
+                    "tenant_state_id": null,
+                    "created_by": 1,
+                    "modified_by": 1,
+                    "modified_on": "1722243835",
+                    "created_on": "1877876543",
+                    "tenant_environment": null,
+                    "tenant_state": null,
+                    "region_id": null,
+                    "test_status": {
+                        "taxonomy_id": 13002,
+                        "asset_id": null,
+                        "asset_url": null,
+                        "group_name": null,
+                        "taxonomy_code": "SUCCESS",
+                        "taxonomy_name": "Successful",
+                        "taxonomy_value": null,
+                        "taxonomy_numeric": null,
+                        "taxonomy_type": "HOST_TEST_STATUS",
+                        "taxonomy_category": null,
+                        "additional_param_1": null,
+                        "additional_param_2": null,
+                        "is_active": true,
+                        "is_deleted": false,
+                        "priority_order": 2,
+                        "parent_id": null,
+                        "created_by": null,
+                        "created_on": "1716894530"
+                    },
+                    "created_by_user": {
+                        "user_id": 1,
+                        "email_id": "abc@example.com",
+                        "external_id": "EX2341",
+                        "first_name": "abc",
+                        "last_name": "alpha",
+                        "display_name": "abc alpha"
+                    },
+                    "modified_by_user": {
+                        "user_id": 1,
+                        "email_id": "abc@example.com",
+                        "external_id": "EX2341",
+                        "first_name": "abc",
+                        "last_name": "alpha",
+                        "display_name": "abc alpha"
+                    }
+                },
+                ...
+            ]
+            }
+
+        II) Get Tenant Record by Id
+            -> Description: Provides information about a tenant record from Tenant Master table.
+            -> Endpoint: /firebird/userMaster/:id
+            -> SAP APIs Invoked: None
+            -> Method: GET
+            -> Payload: 
+                Param: id  // is the tenant_id
+            -> Output: {
+                "success": true,
+                "statusCode": 200,
+                "type": "RecordFound",
+                "message": "A list of tenant record for id: 1",
+                "data": {
+                        "tenant_id": 1,
+                        "tenant_name": "Tenant QA 1",
+                        "tenant_description": "PG QA Tenant 1",
+                        "tenant_region_id": null,
+                        "tenant_host_url": "https://pgisqa1.it-cpi013.cfapps.us21.hana.ondemand.com",
+                        "tenant_host_token_api": "https://pgisqa1.authentication.us21.hana.ondemand.com/oauth/token",
+                        "tenant_iflow_host_url": null,
+                        "tenant_host_username": "sb-773c5641-1cb9-448f-ab14-a0d824fd1b7c!b11838|it!b46",
+                        "tenant_host_password": "c482c7cd-4cde-472a-8c33-1383ef80ab34$4OqC9Hqem4f-u3E1L-xpfjOrlyqGR2fr_e-z93w_OWA=",
+                        "tenant_iv_salt": "TEMPORARY",
+                        "tenant_host_test_status_id": null,
+                        "tenant_host_test_status_on": "1720434669",
+                        "tenant_util_host_url": "https://pgisqa1.it-cpi013-rt.cfapps.us21.hana.ondemand.com",
+                        "tenant_util_token_url": "https://pgisqa1.authentication.us21.hana.ondemand.com/oauth/token",
+                        "tenant_util_client_id": "sb-cedca67a-3c51-4f77-9142-6d76bb156ad8!b11838|it-rt-pgisqa1!b46",
+                        "tenant_util_client_secret": "312ee918-eb46-4f0c-a2a5-4bb40863c0ca$oLztoDdxg7tpNIYV4qtYVH8CKEgH8m4hY1tTTA2Vqw4=",
+                        "tenant_util_iv_salt": "TEMPORARY",
+                        "tenant_environment_id": null,
+                        "tenant_state_id": null,
+                        "created_by": 1,
+                        "modified_by": 1,
+                        "modified_on": "1720434669",
+                        "created_on": "1877876543",
+                        "tenant_environment": null,
+                        "tenant_state": null,
+                        "region_id": null,
+                        "test_status": null,
+                        "created_by_user": {
+                            "user_id": 1,
+                            "email_id": "abc@example.com",
+                            "external_id": "EX2341",
+                            "first_name": "abc",
+                            "last_name": "alpha",
+                            "display_name": "abc alpha"
+                        },
+                        "modified_by_user": {
+                            "user_id": 1,
+                            "email_id": "abc@example.com",
+                            "external_id": "EX2341",
+                            "first_name": "abc",
+                            "last_name": "alpha",
+                            "display_name": "abc alpha"
+                        }
+                    }
+        }
+
+        III) Update a Tenant Record
+            -> Description: Update a Tenant record in Tenant Master table.
+            -> Endpoint: /firebird/userMaster/:id
+            -> SAP APIs Invoked: None
+            -> Method: PUT
+            -> Payload: {
+                "tenant_id": 5,
+                "tenant_name": "Tenant QA 2",
+                "tenant_description": "PG QA Tenant 2",
+                "tenant_region_id": 16001,
+                "tenant_host_url": "https://pgisqa2.it-cpi009.cfapps.us20.hana.ondemand.com",
+                "tenant_host_token_api": "https://pgisqa2.authentication.us20.hana.ondemand.com/oauth/token",
+                "tenant_iflow_host_url": null,
+                "tenant_host_username": "sb-08c908ac-89f8-4ce2-918a-2f93e2da4f35!b12346|it!b34",
+                "tenant_host_password": "47810be4-309c-4296-b2ff-4596e090ad37$j_ExYphyBePaIte1PH7br85_LbbhgZka-QlaWc2G7i4=",
+                "tenant_iv_salt": "TEMPORARY",
+                "tenant_host_test_status_id": 13001,
+                "tenant_host_test_status_on": null,
+                "tenant_util_host_url": "https://pgisqa2.it-cpi009-rt.cfapps.us20.hana.ondemand.com",
+                "tenant_util_token_url": "https://pgisqa2.authentication.us20.hana.ondemand.com/oauth/token",
+                "tenant_util_client_id": "sb-c25c9405-8c9b-4224-b651-d32d3f7225b4!b12346|it-rt-pgisqa2!b34",
+                "tenant_util_client_secret": "ef835ffc-1d4c-475d-9fa4-fb7f67d4a3b1$VFOMGm3IPC0Tw02wD2Tq_-jTDbFOQUh83MBgWNPRKkI=",
+                "tenant_util_iv_salt": "TEMPORARY",
+                "tenant_environment_id": 12001,
+                "tenant_state_id": 14001,
+                "created_by":1,
+                "modified_by": 1
+            }
+            -> Output: {
+            "tenant_id": 5,
+            "tenant_name": "Tenant QA 2",
+            "tenant_description": "PG QA Tenant 2",
+            "tenant_region_id": 16001,
+            "tenant_host_url": "https://pgisqa2.it-cpi009.cfapps.us20.hana.ondemand.com",
+            "tenant_host_username": "sb-08c908ac-89f8-4ce2-918a-2f93e2da4f35!b12346|it!b34",
+            "tenant_host_token_api": "https://pgisqa2.authentication.us20.hana.ondemand.com/oauth/token",
+            "tenant_iflow_host_url": null,
+            "tenant_host_password": "YWVlOGRjMTVhNjM3YWM1MDZjNDNlZGQ5NjI5OWI5NjM4OGQ4MGU2NmYxZWUzOWNmMThlODAxN2EzMjY1N2ZlZDk2ODRkMzE3ZDM0ZjVlYjBiNTgwN2FhYTc3MTY1ZTdlMzc2MTUxMWQ4ZDMyYWQ0NWZmNzVkNzM4ZDE2ODJmNTY1NzkxZmE3YTI2NmE4MDQyOTQxODNhMzYzM2YwOGQ5MzEwMWQzOGYzMTUxN2QzMDg2MGE0NDAwZWUwMWFhNmIx",
+            "tenant_iv_salt": "TEMPORARY",
+            "tenant_host_test_status_id": 13001,
+            "tenant_host_test_status_on": null,
+            "tenant_util_host_url": "https://pgisqa2.it-cpi009-rt.cfapps.us20.hana.ondemand.com",
+            "tenant_util_token_url": "https://pgisqa2.authentication.us20.hana.ondemand.com/oauth/token",
+            "tenant_util_client_id": "sb-c25c9405-8c9b-4224-b651-d32d3f7225b4!b12346|it-rt-pgisqa2!b34",
+            "tenant_util_client_secret": "NDg1ODA4YTAyMzY0MWRkY2ZlMjhkNDM2MTJhZjU2NzE4MWVhZTVlOWVjYWQxOWRlYTkxOTBkN2VlNDM4NjM0NmNhYjczY2RhNTc1MjNhMGE2YTE0N2M1YWRiMWY0NzBjNTMwMGNlYmVkYTYxMjM1ZjA2NGY0NzljMTA1NWM0ZmVkY2Y1MGQ2YjZlZDhlOGYyYjBkM2JhODI2ZjBhMjVlNzNmZDVkODYxMTZlNWM5NmQ3ZWQ4Njc3MTg3NmEzODYx",
+            "tenant_util_iv_salt": "TEMPORARY",
+            "tenant_environment_id": 12001,
+            "tenant_state_id": 14001,
+            "created_by": 1,
+            "modified_by": 1,
+            "created_on": "1717408403",
+            "modified_on": 1722249430
+        }
+
+        IV) Create A Tenant Record
+            -> Description: Create a Tenant record in Tenant Master table.
+            -> Endpoint: /firebird/userMaster/:id
+            -> SAP APIs Invoked: None
+            -> Method: POST
+            -> Payload: {
+                    "tenant_name": "Tenant QA extra",
+                    "tenant_description" :"PG QA Tenant extra", 
+                    "tenant_region_id": 16001,
+                    "tenant_host_token_api": "abc",
+                    "tenant_host_url":"cbc",
+                    "tenant_host_username": "cjcj4",
+                    "tenant_host_password": "LFAKAF",
+                    "tenant_iv_salt": "TEMPORARY",
+                    "tenant_host_test_status_id": 13002,
+                    "tenant_host_test_status_on": 1765635267,
+                    "tenant_util_host_url":"",
+                    "tenant_util_token_url": "",
+                    "tenant_util_client_id": "",
+                    "tenant_util_client_secret": "",
+                    "tenant_util_iv_salt": "TEMPORARY",
+                    "tenant_environment_id": 12001,
+                    "tenant_state_id": null,
+                    "created_by": "1",
+                    "modified_by": "1"
+                }
+                
+            -> Output: {
+                "created_on": "1722245865",
+                "modified_on": "1722245865",
+                "tenant_id": 18,
+                "tenant_name": "Tenant QA extra",
+                "tenant_description": "PG QA Tenant extra",
+                "tenant_region_id": 16001,
+                "tenant_host_url": "cbc",
+                "tenant_host_token_api": "abc",
+                "tenant_iflow_host_url": null,
+                "tenant_host_username": "cjcj4",
+                "tenant_host_password": "ZjMyODkxMjJiZDFjZWFlNmUxNTgyZWU4NDE4NTM1NzA=",
+                "tenant_iv_salt": "TEMPORARY",
+                "tenant_host_test_status_id": 13002,
+                "tenant_host_test_status_on": "1765635267",
+                "tenant_util_host_url": "",
+                "tenant_util_token_url": "",
+                "tenant_util_client_id": "",
+                "tenant_util_client_secret": "NDliMzUyOGQ1OGIwZGZlYmQwM2U3NjU0M2MzNjBlNmY=",
+                "tenant_util_iv_salt": "TEMPORARY",
+                "tenant_environment_id": 12001,
+                "tenant_state_id": null,
+                "created_by": 1,
+                "modified_by": 1
+            }
+
+        V) Delete a Tenant Record
+            -> Description: Delete a tenant record from Tenant Master table.
+                        If the tenant record is used in UFM profile, it would not allow to delete it.
+
+            -> Endpoint: /firebird/userMaster/:tenantId
+            -> SAP APIs Invoked: None
+            -> Method: DELETE
+            -> Payload: 1 // :tenantId number
+            -> Output: {
+                "success": true,
+                "statusCode": 200,
+                "type": "RecordDelete",
+                "message": "Record deleted of tenant: 5",
+                "data": {}
+            }
+
+    A.3) Git Master
+        I) Create a Git Master Record
+            -> Description: Create a record for git information in git master table
+            -> Endpoint: /firebird/gitRepository
+            -> SAP APIs Invoked: None
+            -> Method: POST
+            -> Payload: {
+                "gr_name": "poc-remote",
+                "gr_owner_name": "newTarento",
+                "gr_description": "git tarento remote repo",
+                "gr_environment_id": 12001,
+                "gr_host_url": "url one",
+                "gr_auth_method_id": 1,
+                "gr_api_token": "",
+                "gr_client_secret": "XYZ",
+                "gr_client_id": 1,
+                "gr_iv_salt": "SALT",
+                "gr_state_id": 14001,
+                "created_by": 1,
+                "modified_by": 1
+            }
+            -> Output: {
+                "created_on": "1722253582",
+                "modified_on": "1722253582",
+                "gr_id": 2,
+                "gr_name": "poc-remote",
+                "gr_owner_name": "newTarento",
+                "gr_description": "git tarento remote repo",
+                "gr_environment_id": 12001,
+                "gr_host_url": "url one",
+                "gr_auth_method_id": 1,
+                "gr_api_token": "",
+                "gr_client_secret": "XYZ",
+                "gr_client_id": "1",
+                "gr_iv_salt": "SALT",
+                "gr_state_id": 14001,
+                "created_by": 1,
+                "modified_by": 1
+            }
+
+        II) Get all Git Master Records list
+            -> Description: get all records from git master table
+            -> Endpoint: /firebird/gitRepository
+            -> SAP APIs Invoked: None
+            -> Method: GET
+            -> Payload: None
+            -> Output: {
+                "success": true,
+                "statusCode": 200,
+                "type": "RecordFound",
+                "message": "A list of git records",
+                "data": [
+                    {
+                        "gr_id": 29,
+                        "gr_owner_name": "repoowner",
+                        "gr_name": "P-G-Repo",
+                        "gr_description": "test owner",
+                        "gr_environment_id": 12001,
+                        "gr_host_url": null,
+                        "gr_auth_method_id": null,
+                        "gr_api_token": null,
+                        "gr_client_id": null,
+                        "gr_state_id": 13002,
+                        "created_by": 7,
+                        "modified_by": 7,
+                        "created_on": "1720703099",
+                        "modified_on": "1722252249",
+                        "git_environment": {
+                            "taxonomy_id": 12001,
+                            "asset_id": null,
+                            "asset_url": null,
+                            "group_name": null,
+                            "taxonomy_code": "DEV",
+                            "taxonomy_name": "Development",
+                            "taxonomy_value": null,
+                            "taxonomy_numeric": null,
+                            "taxonomy_type": "ENV_NAME",
+                            "taxonomy_category": null,
+                            "additional_param_1": null,
+                            "additional_param_2": null,
+                            "is_active": true,
+                            "is_deleted": false,
+                            "priority_order": 1,
+                            "parent_id": null,
+                            "created_by": null,
+                            "created_on": "1716894530"
+                        },
+                        "git_state": {
+                            "taxonomy_id": 13002,
+                            "asset_id": null,
+                            "asset_url": null,
+                            "group_name": null,
+                            "taxonomy_code": "SUCCESS",
+                            "taxonomy_name": "Successful",
+                            "taxonomy_value": null,
+                            "taxonomy_numeric": null,
+                            "taxonomy_type": "HOST_TEST_STATUS",
+                            "taxonomy_category": null,
+                            "additional_param_1": null,
+                            "additional_param_2": null,
+                            "is_active": true,
+                            "is_deleted": false,
+                            "priority_order": 2,
+                            "parent_id": null,
+                            "created_by": null,
+                            "created_on": "1716894530"
+                        }
+                    },
+                    ... other data objects
+                ]
+            }
+
+        IV) Update a Git Mater Record
+            -> Description: Create a record for git information in git master table
+            -> Endpoint: /firebird/gitRepository
+            -> SAP APIs Invoked: None
+            -> Method: POST
+            -> Payload: { 
+                "gr_name":"git 41",
+                "gr_id":9,
+                "gr_description":"git 1112",
+                "gr_owner_name":"mcncj",
+                "gr_environment_id":12001,
+                "gr_client_secret":null,
+                "gr_state_id":14001,
+                "modified_by":5,
+                "gr_iv_salt":"TEMPORARY"
+                }
+
+            -> Output: {
+                "gr_id": 9,
+                "gr_owner_name": "mcncj",
+                "gr_name": "git 41",
+                "gr_description": "git 1112",
+                "gr_environment_id": 12001,
+                "gr_host_url": null,
+                "gr_auth_method_id": null,
+                "gr_api_token": null,
+                "gr_client_secret": "YjFiMjYyMGE4MmUzNDNmMGM2YTA4ZGZhNjVjNjJmZTM4YmE4Njg1M2Q2ZWE2YzAzZWEzMWI4OTc5NTZmNjBlZDhiY2NjNzVhMDI5MjgxZDljNGMyYzVkYWJmY2FhNWI1",
+                "gr_client_id": null,
+                "gr_iv_salt": "TEMPORARY",
+                "gr_state_id": 14001,
+                "created_on": "1717508573",
+                "created_by": null,
+                "modified_on": 1722422080,
+                "modified_by": 5
+            }
+
+        V) Delete a Git Master Record
+            -> Description: Create a record for git information in git master table. 
+                If the git record is used in UFM profile, it would not allow to delete it.
+            -> Endpoint: /firebird/gitRepository
+            -> SAP APIs Invoked: None
+            -> Method: POST
+            -> Output: {
+                "success": true,
+                "statusCode": 200,
+                "type": "RecordDelete",
+                "message": "Record deleted of respository: git 7",
+                "data": {}
+            }
+
+    A.4) UFM Profile
+        I) Create a UFM Profile Record
+            -> Description: Create a record for UFM profile information in UFM Profile Master table
+            -> Endpoint: /firebird/ufm
+            -> SAP APIs Invoked: None
+            -> Method: POST
+            -> Payload: {
+                "ufm_profile_name":"new profile",
+                "ufm_profile_environment_id":12001,
+                "ufm_profile_primary_tenant_id":1,
+                "ufm_profile_secondary_tenant_id":2,
+                "ufm_profile_gr_id":6,
+                "ufm_profile_tenant_state_id":14001,
+                "created_by":5,
+                "modified_by":5,
+                "ufm_profile_source_runtime":null,
+                "ufm_profile_destination_runtime":null
+                }
+            -> Output: {
+                "created_on": "1722423196",
+                "modified_on": "1722423196",
+                "ufm_profile_id": 70,
+                "ufm_profile_name": "new profile",
+                "ufm_profile_environment_id": 12001,
+                "ufm_profile_primary_tenant_id": 1,
+                "ufm_profile_secondary_tenant_id": 2,
+                "ufm_profile_gr_id": 6,
+                "ufm_profile_tenant_state_id": 14001,
+                "ufm_profile_source_runtime": null,
+                "ufm_profile_destination_runtime": null,
+                "created_by": "5",
+                "modified_by": "5"
+            }
+
+        II) Get All UFM Profile Recods
+            -> Description: Get all UFM profile records from the UFM Profile Master table
+            -> Endpoint: /firebird/ufm
+            -> SAP APIs Invoked: None
+            -> Method: GET
+            -> Payload: None
+            -> Output: {
+                "success": true,
+                "statusCode": 200,
+                "type": "RecordFound",
+                "message": "A list of ufm profile records",
+                "data": [
+                    {
+                        "ufm_profile_id": 35,
+                        "ufm_profile_name": "ufm profile-test",
+                        "ufm_profile_environment_id": 12001,
+                        "ufm_profile_primary_tenant_id": 1,
+                        "ufm_profile_secondary_tenant_id": 2,
+                        "ufm_profile_gr_id": 65,
+                        "ufm_profile_tenant_state_id": 14001,
+                        "ufm_profile_source_runtime": null,
+                        "ufm_profile_destination_runtime": null,
+                        "created_by": "7",
+                        "modified_by": "7",
+                        "created_on": "1721287364",
+                        "modified_on": "1721725943",
+                        "ufm_profile_primary_tenant": {
+                            "tenant_id": 1,
+                            "tenant_name": "Tenant QA 1",
+                            "tenant_description": "PG QA Tenant 1"
+                        },
+                        "ufm_profile_secondary_tenant": {
+                            "tenant_id": 2,
+                            "tenant_name": "Tenant QA 2",
+                            "tenant_description": "PG QA Tenant 2"
+                        },
+                        "git_repository": {
+                            "gr_id": 65,
+                            "gr_owner_name": "Annapurna",
+                            "gr_name": "git_2207",
+                            "gr_description": "Git Connection test 27072024"
+                        },
+                        "environment_id": {
+                            "taxonomy_id": 12001,
+                            "asset_id": null,
+                            "asset_url": null,
+                            "group_name": null,
+                            "taxonomy_code": "DEV",
+                            "taxonomy_name": "Development",
+                            "taxonomy_value": null,
+                            "taxonomy_numeric": null,
+                            "taxonomy_type": "ENV_NAME",
+                            "taxonomy_category": null,
+                            "additional_param_1": null,
+                            "additional_param_2": null,
+                            "is_active": true,
+                            "is_deleted": false,
+                            "priority_order": 1,
+                            "parent_id": null,
+                            "created_by": null,
+                            "created_on": "1716894530"
+                        },
+                        "tenant_state": {
+                            "taxonomy_id": 14001,
+                            "asset_id": null,
+                            "asset_url": null,
+                            "group_name": null,
+                            "taxonomy_code": "ACTIVE",
+                            "taxonomy_name": "Active",
+                            "taxonomy_value": null,
+                            "taxonomy_numeric": null,
+                            "taxonomy_type": "ENTITY_STATE",
+                            "taxonomy_category": null,
+                            "additional_param_1": null,
+                            "additional_param_2": null,
+                            "is_active": true,
+                            "is_deleted": false,
+                            "priority_order": 1,
+                            "parent_id": null,
+                            "created_by": null,
+                            "created_on": "1716894530"
+                        },
+                        "git_last_backup_on": null,
+                        "last_sync_on": "1722245440"
+                    },
+                    ... 
+                ]
+        }
+
+        III) Update a UFM Profile Record
+            -> Description: Get all UFM profile records from the UFM Profile Master table
+            -> Endpoint: /firebird/ufm
+            -> SAP APIs Invoked: None
+            -> Method: PUT
+            -> Payload: {
+                "ufm_profile_id": 1,
+                "ufm_profile_name": "ufm-one",
+                "ufm_profile_environment_id": 12001,
+                "ufm_profile_primary_tenant_id": 1,
+                "ufm_profile_secondary_tenant_id":1,
+                "ufm_profile_gr_id": 1,
+                "ufm_profile_tenant_state_id": 14001,
+                "created_by": 1,
+                "modified_by": 1
+            }
+
+            -> Output: {
+                "ufm_profile_id": 1,
+                "ufm_profile_name": "ufm-one",
+                "ufm_profile_environment_id": 12001,
+                "ufm_profile_primary_tenant_id": 1,
+                "ufm_profile_secondary_tenant_id": 1,
+                "ufm_profile_gr_id": 1,
+                "ufm_profile_tenant_state_id": 14001,
+                "created_on": "1766523546",
+                "created_by": 1,
+                "modified_on": 1717497035,
+                "modified_by": 1
+            }
+
+        IV) Delete a UFM Profile Record
+            -> Description:Delete a record from UFM Profile Master table.
+            -> Endpoint: /firebird/ufm/:ufmProfileId
+            -> SAP APIs Invoked: None
+            -> Method: DELETE
+            -> Endpoint: /firebird/ufm/:ufmProfileId 
+            -> Output: {
+                    "success": true,
+                    "statusCode": 200,
+                    "type": "RecordDelete",
+                    "message": "Record deleted for ufm profile id: 70",
+                    "data": {}
+                }
+
+--------------------------------------------------------------------------
+
+B) Test Connection
+
+    B.1) Tenant Check Connection
+            -> Description: Check connection to a tenant. If the API and Integration Suite Credentials are
+            correct then the connection would be okay. Otherwise it would show error: "Tenant connection not okay"
+            -> Endpoint: firebird/tenantAction/:tenantId
+            -> SAP APIs Invoked: None
+            -> Method: GET
+            -> Payload: None
+            -> Output: 
+                1. When connection is okay.
+                {
+                    "success": true,
+                    "statusCode": 200,
+                    "type": "TestConnection",
+                    "message": "Tenant connection is okay",
+                    "data": {}
+                }
+
+                2. When connection is not okay.
+                {
+                    "success": false,
+                    "statusCode": 200,
+                    "type": "TestConnection",
+                    "error": {
+                        "message": "Tenant connection not okay"
+                    }
+                }
+
+    B.2) Git Check Connection
+        -> Description: Check connection to a git repository. If the git credential is correct,
+            then we get a success message flag.
+        -> Endpoint: /firebird/gitAction/check-connection/:grId
+        -> SAP APIs Invoked: None
+        -> Method: GET
+        -> Payload: None
+        -> Output: 
+            1. If the connection is okay
+                {"success":true}
+            2. If the connection is not okay
+                {"success":false}
+
+--------------------------------------------------------------------------
+
+C) Taxonomy
+
+    C.1) Type
+         -> Description: Get the various types of data for taxonomy so that they could be used in dropdowns and various options.
+        -> Endpoint: /firebird/taxonomy/type
+        -> SAP APIs Invoked: None
+        -> Method: GET
+        -> Payload: None
+        -> Output: {
+        "data": {
+            "ENV_NAME": [
+                {
+                    "taxonomy_id": 12001,
+                    "asset_id": null,
+                    "asset_url": null,
+                    "group_name": null,
+                    "taxonomy_code": "DEV",
+                    "taxonomy_name": "Development",
+                    "taxonomy_value": null,
+                    "taxonomy_numeric": null,
+                    "taxonomy_type": "ENV_NAME",
+                    "taxonomy_category": null,
+                    "additional_param_1": null,
+                    "additional_param_2": null,
+                    "is_active": true,
+                    "is_deleted": false,
+                    "priority_order": 1,
+                    "parent_id": null,
+                    "created_by": null,
+                    "created_on": "1716894530"
+                },
+                ...
+            ],
+            "HOST_TEST_STATUS": []
+            "ENTITY_STATE": []
+            "TENANT_REGION": []
+            "GIT_AUTH_METHOD":[]
+         } 
+        }
+
+--------------------------------------------------------------------------
+
+D) User Credentials
+
+    D.1) Get All User Credentials
+        -> Description: Get the list of various user credentials
+        -> Endpoint: /firebird/userCredentials/list/:ufmProfileId/:componentTypeId
+        -> SAP APIs Invoked: 
+            1. /api/v1/UserCredentials [ method: GET ]
+            2. /http/GetCredentials [ Iflow utility to get Password]
+            3. /api/v1/IntegrationRuntimeArtifacts('Util_GetCredentials')
+
+        -> Method: GET
+        -> Payload:  ufm profile id and component type id to passed as params
+        -> Output: {
+    "data": {
+        "tenantOneUserCredentials": [
+            {
+                "__metadata": {
+                    "id": "https://pgisqa1.it-cpi013.cfapps.us21.hana.ondemand.com:443/api/v1/UserCredentials('CPIUserCred')",
+                    "uri": "https://pgisqa1.it-cpi013.cfapps.us21.hana.ondemand.com:443/api/v1/UserCredentials('CPIUserCred')",
+                    "type": "com.sap.hci.api.UserCredential"
+                },
+                "Name": "CPIUserCred",
+                "Kind": "default",
+                "Description": "HTTP Call to QA1",
+                "User": "sb-2a06ca62-415c-4155-ba6a-32adf341e2c1!b11838|it-rt-pgisqa1!b46",
+                "Password": "24e5e39e-896a-4401-8a92-a4512eaf667d$nPNGMC8GzsOSIpIBGhYlY92wc5cPyyeDh9maean8PaQ=",
+                "CompanyId": null,
+                "SecurityArtifactDescriptor": {
+                    "__metadata": {
+                        "type": "com.sap.hci.api.SecurityArtifactDescriptor"
+                    },
+                    "Type": "CREDENTIALS",
+                    "DeployedBy": "EV7929",
+                    "DeployedOn": "/Date(1716569442125)/",
+                    "Status": "DEPLOYED"
+                },
+                "Status": "DEPLOYED",
+                "isPasswordCorrupt": false
+            },
+            .. other user creds...
+        ],
+         "tenantOneUserCredentials": [
+            ...
+         ]
+    }
+        }
+
+    D.2) Copy all User Credentials
+        -> Description: Copy user credentials from one tenant to another. Uses "doesExistOnTarget" flag from payload for deciding whether to update user credential or create a new user credential.
+        -> Endpoint: /firebird/userCredentials/copy
+        -> SAP APIs Invoked
+            1. /api/v1/UserCredentials('${credential.Name}') [ method: PUT, for updating user credential]
+            2. /api/v1/UserCredentials [method: POST ]
+        -> Method: POST
+        -> Payload: {
+            "ufm_profile_id": 1,
+            "component_type_id": 11002,
+            "user_id": 5,
+            "payload": [
+                {
+                    "Name": "CPIUserCred",
+                    "Kind": "default",
+                    "Description": "HTTP Call to QA1",
+                    "User": "sb-2a06ca62-415c-4155-ba6a-32adf341e2c1!b11838|it-rt-pgisqa1!b46",
+                    "Password": "24e5e39e-896a-4401-8a92-a4512eaf667d$nPNGMC8GzsOSIpIBGhYlY92wc5cPyyeDh9maean8PaQ=",
+                    "CompanyId": null,
+                    "__metadata": {
+                        "id": "https://pgisqa1.it-cpi013.cfapps.us21.hana.ondemand.com:443/api/v1/UserCredentials('CPIUserCred')",
+                        "uri": "https://pgisqa1.it-cpi013.cfapps.us21.hana.ondemand.com:443/api/v1/UserCredentials('CPIUserCred')",
+                        "type": "com.sap.hci.api.UserCredential"
+                    },
+                    "SecurityArtifactDescriptor": {
+                        "__metadata": {
+                            "type": "com.sap.hci.api.SecurityArtifactDescriptor"
+                        },
+                        "Type": "CREDENTIALS",
+                        "DeployedBy": "EV7929",
+                        "DeployedOn": "/Date(1716569442125)/",
+                        "Status": "DEPLOYED"
+                    },
+                    "doesExistOnTarget": true
+                },
+                ... other items ...
+            ]
+            }
+        -> Output: 
+            1. Unsuccessful user credentials copy, response status: 200
+                {
+                    "invalidCredentials": [
+                        "FireBird_Oauth",
+                        "OPAS_EventMesh_OAuth",
+                        "OPAS_CPI_Oauth"
+                    ]
+                }
+            2. Successful user credentials copy, response status: 200
+                {
+                    "message": "User credentials copied successfully"
+                }
+
+--------------------------------------------------------------------------
+
+E) Global Variables
+    E.1) Get All Global Variables
+            -> Description: Lists all 'Global' Variables in both the tenants. First we are listing the variables using a SAP API, then hitting another SAP API to get the zip file where variable value is stored. From the zip file using file operations we are able to extract variable value. After this we are creating an array of object for various attributes of a variable and sending them in the list api.
+            -> SAP APIs Invoked: 
+                1. /api/v1/Variables [ method: GET, to list all variables for a tenant ]
+                2. /api/v1/Variables(VariableName='{VariableName}',IntegrationFlow='{IntegrationFlow}')/$value [ method: GET, to get the zip file where variable value is stored]
+
+            -> Endpoint: /firebird/variables/list/:ufmProfileId/:componentTypeId
+            -> Method: GET
+            -> Payload: ufm profile id and component type id in params
+            -> Output: {
+                "success": true,
+                "statusCode": 200,
+                "type": "ResponseSuccessFromAPI",
+                "message": "Variables for the given ufm profile id: 1 tenants",
+                "data": {
+                    "tenantOneVariables": [
+                        {
+                            "__metadata": {
+                                "id": "https://pgisqa1.it-cpi013.cfapps.us21.hana.ondemand.com:443/api/v1/Variables(VariableName='2812af9f-70de-44ac-aa63-5e0b0ddedbe4',IntegrationFlow='')",
+                                "uri": "https://pgisqa1.it-cpi013.cfapps.us21.hana.ondemand.com:443/api/v1/Variables(VariableName='2812af9f-70de-44ac-aa63-5e0b0ddedbe4',IntegrationFlow='')",
+                                "type": "com.sap.hci.api.Variable",
+                                "content_type": "application/octet-stream",
+                                "media_src": "https://pgisqa1.it-cpi013.cfapps.us21.hana.ondemand.com:443/api/v1/Variables(VariableName='2812af9f-70de-44ac-aa63-5e0b0ddedbe4',IntegrationFlow='')/$value",
+                                "edit_media": "https://pgisqa1.it-cpi013.cfapps.us21.hana.ondemand.com:443/api/v1/Variables(VariableName='2812af9f-70de-44ac-aa63-5e0b0ddedbe4',IntegrationFlow='')/$value"
+                            },
+                            "VariableName": "2812af9f-70de-44ac-aa63-5e0b0ddedbe4",
+                            "IntegrationFlow": "",
+                            "Visibility": "Global",
+                            "UpdatedAt": "/Date(1722262442550)/",
+                            "RetainUntil": "/Date(1756822442550)/",
+                            "variableValue": ""
+                        },
+                        ... other global variables info...
+                    ],
+                    "tenantTwoVariables": [ ... similar data ... ]
+                }
+            }
+
+    E.2) Copy All Global Variables
+            -> Description: All global variables are copied from one tenant to another through the source and destination set in ufm profile id. We get a list of all the variables from source tenant and then copy them to target tenant.
+            -> SAP APIs Invoked: 
+                1. /api/v1/Variables(VariableName='{VariableName}',IntegrationFlow='{IntegrationFlow}')/$value [ method: GET, to get the zip file where variable value is stored]
+                2. http/Util/SetVariable [ method: POST, utility Iflow to update the variable value ]
+
+            -> Endpoint: /firebird/variables/copy
+            -> Method: POST
+            -> Payload: {
+                "ufm_profile_id": 1,
+                "component_type_id": 11005,
+                "user_id": 1
+            }
+
+            -> Output: {
+                "success": true,
+                "statusCode": 200,
+                "type": "ResponseSuccessFromAPI",
+                "message": "Variables Copied successfully",
+                "data": [
+                    "test_variable_0045",
+                    "Customer_Sarah",
+                    "jdbcdemo_variable",
+                    "Iflow_POC",
+                    "test_variable_003",
+                    "test_variable_001",
+                    "2812af9f-70de-44ac-aa63-5e0b0ddedbe4",
+                    "png-1",
+                    "test_variable_002"
+                ]
+            }
+
+--------------------------------------------------------------------------
+
+F) OAuth2 Client Credentials
+    F.1)  Get All Outh2 Client Credentials List
+            -> Description: Lists all the OAuth2 Client Credentials for both the tenants. Using SAP API we are first Listing all Credentials and then using the integration flow util we are extracting all the ClientSecret for those Credentials. At the end we are sending all OAuth2 information along with the ClientSecret in the list.
+
+            -> SAP APIs Invoked: 
+                1. /api/v1/OAuth2ClientCredentials [ method : GET, to get list of OAuth2 Credentials]
+                2. /http/GetCredentials [ method: POST, Iflow Util to get ClientSecret for Credentials]
+
+            -> Endpoint: /firebird/OAuth2Credentials/list/:ufmProfileId/:componentTypeId
+            -> Method: GET
+            -> Payload: 
+            -> Output: {
+                "data": {
+                    "tenantOneOAuth2Credentials": [
+                        {
+                            "Name": "OPAS_EventMesh_OAuth",
+                            "Description": "",
+                            "TokenServiceUrl": "https://pgfincompnp.authentication.eu10.hana.ondemand.com/oauth/token",
+                            "ClientId": "sb-default-7fe4a270-c35e-4fc1-a3e2-a7a83e38220a-clone!b141985|xbem-service-broker-!b2436",
+                            "ClientSecret": "1f1890bc-f1da-4eaa-b9c9-3df4192938a6$sw3b5Lk116Ut3iMXeHxA4IXRMAwSmRfIVJDrcgBOazA=",
+                            "ClientAuthentication": "header",
+                            "Scope": "",
+                            "ScopeContentType": "json",
+                            "Resource": "",
+                            "Audience": "",
+                            "Type": "CREDENTIALS",
+                            "DeployedBy": "DL7152",
+                            "DeployedOn": "/Date(1689921881599)/",
+                            "Status": "DEPLOYED"
+                        },
+                        ... other OAuth2 Client Credentials ...
+                    ],
+                    "tenantTwoOAuth2Credentials": [
+                        ... similar to above ...
+                    ]
+                }
+            }
+
+    F.2)  Copy All OAuth2 Client Credentials
+            -> Description: Copy OAuth2 Client Credentials from Source to Target tenant based on the UFM Profile. A flag "doesExistOnTarget" in the payload decides whether to copy or update the credential, if the flag is true we would do a PUT call to our SAP API, else a POST Call. (We take the help of the deployed Integration flow utility to extract Client Secret for copying)
+
+            -> SAP APIs Invoked: 
+                1. /api/v1/OAuth2ClientCredentials('{CredentialName}') [ method: PUT, to update a OAuth2 Credential]
+                2. /api/v1/OAuth2ClientCredentials [ method: POST, to create new OAuth2 Credential]
+                3. /http/GetCredentials [ method: POST, I-flow Util to get ClientSecret for Credentials]
+
+            -> Endpoint: /firebird/OAuth2Credentials/copy
+            -> Method: POST
+            -> Payload: {
+                "ufm_profile_id": 1,
+                "component_type_id": 11003, 
+                "user_id": 1,
+                "payload" : [
+                    {
+                                "Name": "OPAS_EventMesh_OAuth",
+                                "Description": "",
+                                "TokenServiceUrl": "https://pgfincompnp.authentication.eu10.hana.ondemand.com/oauth/token",
+                                "ClientId": "sb-default-7fe4a270-c35e-4fc1-a3e2-a7a83e38220a-clone!b141985|xbem-service-broker-!b2436",
+                                "ClientAuthentication": "header",
+                                "Scope": "",
+                                "ScopeContentType": "json",
+                                "Resource": "",
+                                "Audience": "",
+                                "doesExistOnTarget": true
+                            }
+                ]
+            }
+            -> Output: {
+                    "message": "OAuth2 Client credentials copied successfully"
+                }
+
+--------------------------------------------------------------------------
+
+G) Keystore and Certificates
+    G.1) Get All Keystore For Tenants
+            -> Description: This is used to list all Keystore values for both the source and target tenants. The SAP API is used to get a list of all Keystore objects and then the output is formatted accordingly to get the list as shown in output of this section.
+            -> SAP APIs Invoked: 
+                1. /api/v1/KeystoreEntries [ method: GET, to get all Keystore Entries]
+
+            -> Endpoint: /firebird/keystore/:tenantOneId/:tenantTwoId
+            -> Method: GET
+            -> Payload: source and target tenant Ids in params
+            -> Output: {
+                "data": {
+                    "tenantOneKeystore": [
+                        {
+                            "Hexalias": "696E74345F6774706365727469666963617465",
+                            "Alias": "int4_gtpcertificate",
+                            "KeyType": "DSA",
+                            "KeySize": 1024,
+                            "ValidNotBefore": "/Date(1162730135000)/",
+                            "ValidNotAfter": "/Date(2145916801000)/",
+                            "SerialNumber": "0x0",
+                            "SignatureAlgorithm": "SHA1withDSA",
+                            "EllipticCurve": null,
+                            "Validity": null,
+                            "SubjectDN": "CN=GTP",
+                            "IssuerDN": "CN=GTP",
+                            "Version": 1,
+                            "FingerprintSha1": "B0:60:30:65:27:69:A1:2A:F0:EA:A1:F4:FA:CC:47:85:31:77:7A:91",
+                            "FingerprintSha256": "07:69:55:A9:12:CC:BD:45:CC:06:5E:77:F5:3E:74:52:7F:ED:C5:63:49:40:31:9B:07:DE:CA:DC:FC:E5:15:D3",
+                            "FingerprintSha512": "ED:74:40:98:A7:4A:10:DE:CB:C0:14:A4:0C:90:F4:00:12:A8:2D:47:EB:80:78:8C:0D:D0:85:F8:43:33:5F:F6:53:06:55:79:69:8E:22:09:2E:AD:6B:21:1E:64:4F:85:45:AF:24:B0:4D:88:ED:6E:BC:63:E8:5C:CB:31:71:81",
+                            "Type": "Certificate",
+                            "Owner": "Tenant Administrator",
+                            "LastModifiedBy": "sb-773c5641-1cb9-448f-ab14-a0d824fd1b7c!b11838|it!b46",
+                            "LastModifiedTime": "/Date(1718626067011)/",
+                            "CreatedBy": "ES3408",
+                            "CreatedTime": "/Date(1705575413747)/",
+                            "Status": "unchanged"
+                        },
+                    ],
+                    "tenantTwoKeystore": [
+                        ... similar to tenant One Keystore values ...
+                    ]
+                }
+            }
+
+    G.2) Copy Certificates 
+            -> Description: The certificates are updated from source to target tenants depending on the ufm profile id. To get the certificate from source tenant, hexalias is used using 1st SAP API. Then it is updated/posted in the target tenant depending on whether the hexalias exists in the target tenant or not, using our 2nd SAP API. The certificates with issues gets mentioned under "errorKeysValue" in the output JSON.
+            -> SAP APIs Invoked: 
+                1. /api/v1/KeystoreEntries('${Hexalias}')/Certificate/$value [ method: GET, to get Certificate ]
+                2. /api/v1/CertificateResources('${Hexalias}')/$value?fingerprintVerified=true&returnKeystoreEntries=true&update=true [Method: PUT, to update/post certificate ]
+
+            -> Endpoint: /firebird/keystore/certificate
+            -> Method: POST
+            -> Payload: { "ufm_profile_id": 1, "component_type_id": 11004, "user_id": 1 }
+            -> Output: {
+                "message": "Certificates copied",
+                "errorKeysValue": [
+                    {
+                        "hexalias": "7361705F766572697369676E20636C6173732033207075626C6963207072696D6172792063657274696669636174696F6E20617574686F72697479202D206735",
+                        "alias": "sap_verisign class 3 public primary certification authority - g5",
+                        "errMsg": "Request failed with status code 403"
+                    },
+                    {
+                        "hexalias": "7361705F646967696365727420676C6F62616C206361206732",
+                        "alias": "sap_digicert global ca g2",
+                        "errMsg": "Request failed with status code 403"
+                    }
+                ],
+                "successArray": [
+                    {
+                        "hexAlias": "656467652D6963656C6C2D71612D30312E70672E636F6D2D6B70",
+                        "alias": "edge-icell-qa-01.pg.com-kp"
+                    }
+                ]
+            }
+
+--------------------------------------------------------------------------
+
+H) Number Ranges
+    H.1) Get All Number Ranges 
+            -> Description: Lists all the number ranges from source and target tenants depending on the UFM Profile Id. For getting the Number ranges objects from both tenants we are using the mentioned SAP API.
+            -> SAP APIs Invoked:
+                1. /api/v1/NumberRanges [ method: GET, to get list of all number ranges within a tenant]
+            -> Endpoint: /firebird/numberRanges/list/:ufmProfileId/:componentTypeId
+            -> Method: POST
+            -> Payload: ufm profile id and component type id in params
+            -> Output: {
+                    "data": {
+                        "tenantOneNumberRanges": [
+                            {
+                                "__metadata": {
+                                    "id": "https://pgisqa1.it-cpi013.cfapps.us21.hana.ondemand.com:443/api/v1/NumberRanges('TestPg1')",
+                                    "uri": "https://pgisqa1.it-cpi013.cfapps.us21.hana.ondemand.com:443/api/v1/NumberRanges('TestPg1')",
+                                    "type": "com.sap.hci.api.NumberRange"
+                                },
+                                "Name": "TestPg1",
+                                "Description": "Test Range",
+                                "MaxValue": "99999999",
+                                "MinValue": "1",
+                                "Rotate": "true",
+                                "CurrentValue": "10",
+                                "FieldLength": "12",
+                                "DeployedBy": "sb-773c5641-1cb9-448f-ab14-a0d824fd1b7c!b11838|it!b46",
+                                "DeployedOn": "/Date(1722262443391)/"
+                            },
+                            ... other number ranges objects ...
+                        ],
+                        "tenantTwoNumberRanges": [... similar data to tenant One...]
+                    }
+            }
+
+    H.2) Copy Number Ranges
+            -> Description: Copying number ranges from source to target tenant. If the flag doesExistOnTarget is true, we make a PUT SAP API call, otherwise we make a POST call to SAP API. In short, if the number ranges dont exist on the target tenant they would be created otherwise if they exist they would be updated from the the source tenant.
+            -> SAP APIs Invoked:
+                1. /api/v1/NumberRanges('{Name}') [ method: PUT, for updating the number range]
+                2. /api/v1/NumberRanges [ method: POST, for creating the number range object]
+
+            -> Endpoint: /firebird/numberRanges/copy
+            -> Method: POST
+            -> Payload: {
+                    "ufm_profile_id": 1,
+                    "component_type_id": 11005, // for number ranges in taxonomy
+                    "user_id": 1,
+                    "payload": [
+                        {
+                            "Name": "TestPg1",
+                            "Description": "Test Range",
+                            "MaxValue": "99999999",
+                            "MinValue": "0",
+                            "Rotate": "true",
+                            "CurrentValue": "0",
+                            "FieldLength": "12",
+                            "DeployedBy": "EX6633",
+                            "DeployedOn": "/Date(1718278750911)/",
+                            "doesExistOnTarget": true
+                        }
+                    ]
+            }
+
+            -> Output: {
+                "message": "Number ranges copied successfully."
+            }
+
+--------------------------------------------------------------------------
+
+I) Packages and Artifacts
+    I.1) List All Packages with Artifacts
+            -> Description: Lists all packages with their corresponding artifacts for both source and target tenants. The list contains certain flags for packages, artifacts for showing their git backup status. The flag "doesConfigExists" tells whether for an artifact some configurations exist or not. The "configCheckSum" sends the checksum for configurations of the artifact which is used to compare (in front end) for which artifacts configuration has changed. And then there is "doesArtifactExistInGit" which shows whether the given artifact's backup has been taken in the github backup repository, similarly "doesExistInGit" flag at package level indicates whether a backup has been taken for package in github repository.
+            
+            -> SAP APIs Invoked:
+                1. /api/v1/IntegrationPackages [ method: GET, list all Packages under for a tenant]
+
+                2. /api/v1/IntegrationPackages('{PackageId}')/IntegrationDesigntimeArtifacts [ method: GET, fetches all Integration Flow designtime artifacts for a package]
+
+                3. /api/v1/IntegrationPackages('{PackageId}')/MessageMappingDesigntimeArtifacts [ method: GET, fetches all Message mapping designtime artifacts for a package]
+
+                4. /api/v1/IntegrationPackages('{PackageId}')/ValueMappingDesigntimeArtifacts [ method: GET, fetches all Value mapping designtime artifacts for a package]
+
+                5. /api/v1/IntegrationPackages('{PackageId}')/ScriptCollectionDesigntimeArtifacts [ method: GET, fetches all Script collection designtime artifacts for a package]
+
+                6. /api/v1/IntegrationDesigntimeArtifacts(Id='{ArtifactId}',Version='{ArtifactVersion}')/Configurations [ method: GET, fetches all the configuration for a designtime artifact]
+
+            -> Endpoint: /firebird/sync/:tenantOneId/:tenantTwoId/:profileId
+            -> Method: GET
+            -> Payload: 1
+            -> Output: {
+                "data": [
+                            {
+                                "key": "Tenant QA 1",
+                                "packages": [
+                                    {
+                                        "PackageId": "SAPCPIPOC",
+                                        "PackageName": "1. SAP Cloud Integration POCs",
+                                        "Version": "1.0.0",
+                                        "Description": "<p></p>",
+                                        "ShortText": "POCs",
+                                        "SupportedPlatform": "Cloud Integration",
+                                        "Products": "",
+                                        "Keywords": "",
+                                        "Countries": "",
+                                        "Industries": "",
+                                        "LineOfBusiness": "",
+                                        "doesExistInGit": false,
+                                        "artifacts": [
+                                            {
+                                                "Id": "RFC_OData_Call_S4Hana_To_Gov",
+                                                "Name": "RFC_OData_Call_S4Hana_To_Gov",
+                                                "Type": "IntegrationDesigntimeArtifacts",
+                                                "Version": "1.0.2",
+                                                "doesConfigExists": true,
+                                                "configCheckSum": "jxjMdk2324QAXnmopBEoLSLMx",
+                                                "doesArtifactExistInGit": false
+                                            }
+                                        ]
+                                    },
+                                    ... other packages and artifacts info similarly ...
+                                ]
+                            },
+                            {
+                                "key": "Tenant QA 2",
+                                "packages": [
+                                    {
+                                        "PackageId": "SAPCPIPOC",
+                                        "PackageName": "1. SAP Cloud Integration POCs",
+                                        "Version": "1.0.0",
+                                        "Description": "<p></p>",
+                                        "ShortText": "POCs",
+                                        "SupportedPlatform": "Cloud Integration",
+                                        "Products": "",
+                                        "Keywords": "",
+                                        "Countries": "",
+                                        "Industries": "",
+                                        "LineOfBusiness": "",
+                                        "doesExistInGit": false,
+                                        "artifacts": [
+                                            {
+                                                "Id": "RFC_OData_Call_S4Hana_To_Gov",
+                                                "Name": "RFC_OData_Call_S4Hana_To_Gov",
+                                                "Type": "IntegrationDesigntimeArtifacts",
+                                                "Version": "1.0.2",
+                                                "doesConfigExists": true,
+                                                "configCheckSum": "jxjMdk2324QAXnmopBEoLSLMx",
+                                                "doesArtifactExistInGit": false
+                                            }
+                                        ]
+                                    },
+                                    ... other packages and artifacts info similarly ...
+                                ]
+                            }
+                    ]
+            }
+
+    I.2) Copy Packages and Artifacts
+            -> Description: Copying packages and artifacts from source to target tenant. If the package does not exist on target tenant first it is created and then the artifacts are copied. If the package exist but artifacts is missing then the missing artifacts are copied in the target tenant. If there is a version mismatch then, there are two cases:
+                1. If artifact type is Integration, message mapping and script collection designtime artifact, then use the PUT APIs (as mentioned in SAP APIs inovked section)
+                2. If the artifact type is Value Mapping, first we delete the artifact and then create it again 
+
+            -> SAP APIs Invoked:
+                1. /api/v1/IntegrationPackages [ method: POST, to create a empty package]
+
+                2. /api/v1/IntegrationDesigntimeArtifacts(Id='{ArtifactId}',Version='${ArtifactVersion}')/$value [method: PUT, to get the content of the Integration designtime artifact ]
+
+                3. /api/v1/MessageMappingDesigntimeArtifacts(Id='{ArtifactId}',Version='${ArtifactVersion}')/$value [method: PUT, to get the content of the Message mapping designtime artifact ]
+
+                5. /api/v1/ScriptCollectionDesigntimeArtifacts(Id='{ArtifactId}',Version='${ArtifactVersion}')/$value [method: PUT, to get the content of the script collection designtime artifact ]
+
+                4. /api/v1/ValueMappingDesigntimeArtifacts(Id='{ArtifactId}',Version='${ArtifactVersion}')/$value [method: PUT, to get the content of the value mapping designtime artifact ]
+
+                5. /api/v1/ValueMappingDesigntimeArtifacts [method: POST, to get content of artifact]
+
+                6. /api/v1/ValueMappingDesigntimeArtifacts(Id='{ArtifactId}',Version='{RequiredVersion}') [method: DELETE, to delete the value mapping artifact for creating it later on, for version change]
+
+            -> Endpoint: /firebird/integrationPackages/clone
+            -> Method: POST
+            -> Payload: {
+                "ufm_profile_id": 1,
+                "component_type_id": 11001,
+                "user_id": 1,
+                "payload": [
+                    {
+                        "packageId": "SAPCPIPOC",
+                        "PackageName": "1. SAP Cloud Integration POCs",
+                        "Description": "",
+                        "ShortText": "",
+                        "SupportedPlatform": "",
+                        "Products": "",
+                        "Keywords": "",
+                        "Countries": "",
+                        "Industries": "",
+                        "LineOfBusiness": "",
+                        "isExistingOnTarget": false,
+                        "artifacts": [
+                            {
+                                "Id": "OData_S4Hana_To_Gov_SFTP",
+                                "Name": "OData_S4Hana_To_Gov_SFTP",
+                                "Type": "IntegrationDesigntimeArtifacts",
+                                "Version": "1.0.12",
+                                "isVersionChange": false
+                            }
+                        ]
+                    }
+                ]
+            }
+            -> Output: { 
+                message: "Packages and Artifacts copied successfully",
+                unsuccessfulPackage: [], 
+                unsuccessfulPackageArtifact:  [] 
+            }
+
+    I.3) Copy Configurations
+            -> Description: Packages and Artifacts have certain configurations. They need to be copied. 
+            In api which lists packages and artifacts, there is a flag: doesConfigExists. If it is true, then in payload only those artifacts are sent for copying of configurations using the SAP APIs. 
+            -> SAP APIs Invoked:
+                1. /api/v1/IntegrationDesigntimeArtifacts(Id='{ArtifactId}',Version='{ArtifactVersion}')/Configurations [method: GET, to get the configurations for an artifact]
+
+                2. /api/v1/IntegrationDesigntimeArtifacts(Id='{ArtifactId}',Version='${ArtifactVersion}')/$links/Configurations('${ParameterKey}') [method: PUT, to update configuration on target tenant]
+
+            -> Endpoint: /firebird/integrationPackages/configUpdate
+            -> Method: POST
+            -> Payload:   { "ufm_profile_id": 1,
+                "component_type_id": 11001,
+                "packages": [
+                    {
+                                    "PackageId": "LuisTestPackage",
+                                    "PackageName": "Luis' Test Package",
+                                    "Version": "1.0.0",
+                                    "Description": "<p></p>",
+                                    "ShortText": "Personal Test Package",
+                                    "SupportedPlatform": "Cloud Integration",
+                                    "Products": "",
+                                    "Keywords": "",
+                                    "Countries": "",
+                                    "Industries": "",
+                                    "LineOfBusiness": "",
+                                    "artifacts":  [
+                                    {
+                                            "Id": "Timer_Testing",
+                                            "Name": "IF_Timer",
+                                            "Type": "IntegrationDesigntimeArtifacts",
+                                            "Version": "1.0.1",
+                                            "doesConfigExists": true
+                                        }
+                                        ... other artifacts under the packages ...
+                                    ]
+                    }
+                ]
+            }
+
+            -> Output: {
+                "message": "Configurations copied successfully",
+                "failedCounter": 2,
+                "failedConfigurations": [
+                    {
+                        "artifactId": "JDBC_SELECT_TEST",
+                        "error": "Request failed with status code 400",
+                        "errorMessage": "Failed to copy configuration for JDBC_SELECT_TEST: Request failed with status code 400"
+                    },
+                    {
+                        "artifactId": "IF_Timer_LoadTesting_Datastore_Write",
+                        "error": "Request failed with status code 400",
+                        "errorMessage": "Failed to copy configuration for IF_Timer_LoadTesting_Datastore_Write: Request failed with status code 400"
+                    }
+                ]
+            }
+
+--------------------------------------------------------------------------
+            
+J) Failover
+    I.1) Schedule a planned/unplanned Failover (or Switchback)
+            -> Description: It schedules a Failover(or Switchback). The Scheduled Failover(or Switchback) then runs in the background and process the request. If a failover/switchback is already running, then it would not allow to shedule another failover/switchback. We are also sending a flag in the payload to keep a record of whether the failover/switchback is a planned or unplanned one.
+            -> SAP APIs Invoked: None
+            -> Endpoint: /firebird/runtimeArtifacts/schedule-failover
+            -> Method: POST
+            -> Payload: {
+                "config_state_id": 14,  
+                "ufm_profile_id": 1,
+                "user_id": 1,
+                "is_planned_failover":true
+                ,"entry_type":"FAILOVER" // another option "SWITCH_BACK"
+
+            }
+            -> Output: { "message": "Failover scheduled successfully" }
+
+    I.2) Get status of Planned/Unplanned Failover (or Switchback)
+
+            -> Description: This gives the current status or previous status of a failover/switchback process. This returns which buttons: Failover/Switchback to enable/disable, and the deployment/undeployment status of each of the runtime artifacts could be seen on source and target tenants. Three cases are in this:
+                1. If the failover/Switchback is already running, them disable both buttons flag would be sent (false)
+                2. If failover has been completed, enable Switchback button would be sent 
+                3. If no failover/switchback has been performed yet for the configuration saved. Then enable failover button flag would be sent, along with no artifacts.
+            -> SAP APIs Invoked: None
+            -> Endpoint: /firebird/runtimeArtifacts/failover-status/:ufmProfileId
+            -> Method: POST
+            -> Payload: UFM Profile Id as input params
+            -> Output: {
+                "success": true,
+                "statusCode": 200,
+                "type": "ResponsePositive",
+                "message": "The artifacts are in initial state and ready to schedule a failover process.",
+                "data": {
+                    "processes": [
+                        {
+                            "type": "FAILOVER",
+                            "enableButtonFlag": true
+                        },
+                        {
+                            "type": "SWITCH_BACK",
+                            "enableButtonFlag": false
+                        }
+                    ],
+                    "lineItemInfo": []
+                }
+            }
+        
+--------------------------------------------------------------------------
+
