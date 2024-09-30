@@ -1539,6 +1539,7 @@ const createTenantPairMap = async (req, res) => {
     try {
         console.log('\nCreating tenant pair map record...');
         const {
+            tpm_pair_name,
             tpm_source_tenant,
             tpm_destination_tenant,
             tpm_is_cloning_done,
@@ -1549,6 +1550,7 @@ const createTenantPairMap = async (req, res) => {
         } = req.body;
 
         const tenantPair = await TenantPairMap.create({
+            tpm_pair_name,
             tpm_source_tenant,
             tpm_destination_tenant,
             tpm_is_cloning_done,
@@ -1580,6 +1582,7 @@ const modifyTenantPairMap = async (req, res) => {
         console.log('\nModifying tenant pair map record...');
         const {
             tpm_id,
+            tpm_pair_name,
             tpm_source_tenant,
             tpm_destination_tenant,
             tpm_is_cloning_done,
@@ -1601,6 +1604,7 @@ const modifyTenantPairMap = async (req, res) => {
         }
 
         const tenantPairUpdated = await TenantPairMap.update({
+            tpm_pair_name,
             tpm_source_tenant,
             tpm_destination_tenant,
             tpm_is_cloning_done,
