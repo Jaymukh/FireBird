@@ -21,6 +21,7 @@ const { findOneRecord } = require("../data-access/generalDataAccess");
 const { PROCESS_STATUS } = require("../constants/taxonomyValues");
 const DailyTimeInterval = require("../models/Tenant/dailyTimeInterval");
 const UserModel = require("../models/userModel");
+const TenantPairMap = require("../models/Tenant/tenantPairMap");
 
 
 const baseURLTenantOne = "https://86f3b06dtrial.it-cpitrial06.cfapps.us10-001.hana.ondemand.com/api/v1";
@@ -1470,6 +1471,261 @@ const fetchDailyTimeInterval = async (req, res) => {
     }
 }
 
+const fetchAllTenantPairs = async (req, res) => {
+    try {
+
+        const tenantPairRecords = await TenantPairMap.findAll({
+            where: {
+                is_deleted: false
+            },
+            include: [
+                {
+                    model: UserModel,
+                    as: "created_by_user",
+                    attributes: [
+                        "user_id",
+                        "email_id",
+                        "external_id",
+                        "first_name",
+                        "last_name",
+                        "display_name"
+                    ]
+                },
+                {
+                    model: UserModel,
+                    as: "modified_by_user",
+                    attributes: [
+                        "user_id",
+                        "email_id",
+                        "external_id",
+                        "first_name",
+                        "last_name",
+                        "display_name"
+                    ]
+                },
+                {
+                    model: Tenant,
+                    where: {
+                        is_deleted: false
+                    },
+                    as: "source_tenant",
+                    attributes: ['tenant_id', 'tenant_name', 'tenant_description']
+                },
+                {
+                    model: Tenant,
+                    where: {
+                        is_deleted: false
+                    },
+                    as: "destination_tenant",
+                    attributes: ['tenant_id', 'tenant_name', 'tenant_description']
+                }
+            ],
+            logging: (sql) => {
+                console.log(`SQL for get all tenan pair map, table: ${TenantPairMap.tableName}: `, sql);
+            }
+        })
+
+        if (!tenantPairRecords) {
+            return res.status(404).json({ error: "No data found for tenant pair." })
+        }
+
+        return res.status(200).json({ data: tenantPairRecords })
+    } catch (error) {
+        console.log('error in service fn:fetchAllTenantPairs: ', error);
+    }
+}
+
+const createTenantPairMap = async (req, res) => {
+    try {
+        console.log('\nCreating tenant pair map record...');
+        const {
+            tpm_source_tenant,
+            tpm_destination_tenant,
+            tpm_is_cloning_done,
+            tpm_cloning_progress_status,
+            tpm_cloning_last_performed_on,
+            created_by, // user_id from FE
+            modified_by // user_id from FE
+        } = req.body;
+
+        const tenantPair = await TenantPairMap.create({
+            tpm_source_tenant,
+            tpm_destination_tenant,
+            tpm_is_cloning_done,
+            tpm_cloning_progress_status,
+            tpm_cloning_last_performed_on,
+            created_by,
+            modified_by
+        });
+
+        if (tenantPair) {
+            return res.status(200).json({ message: "Tenant pair created" })
+        }
+    } catch (error) {
+        console.log('error in service fn:createTenantPairMap: ', error);
+        if (error.name.includes('Sequelize')) {
+            if (error.name === 'SequelizeForeignKeyConstraintError') { // in case user or tenant id is invalid
+                return res.status(500).json({ error: error.parent.detail })
+            } else {
+                return res.status(500).json({ error: error.message })
+            }
+        }
+
+        return res.status(500).json({ error: error.message })
+    }
+}
+
+const modifyTenantPairMap = async (req, res) => {
+    try {
+        console.log('\nModifying tenant pair map record...');
+        const {
+            tpm_id,
+            tpm_source_tenant,
+            tpm_destination_tenant,
+            tpm_is_cloning_done,
+            tpm_cloning_progress_status,
+            tpm_cloning_last_performed_on,
+            created_by, // user_id from FE
+            modified_by // user_id from FE
+        } = req.body;
+
+        const tenantPairMapRecord = await TenantPairMap.findOne({
+            where: {
+                tpm_id: tpm_id,
+                is_deleted: false
+            }
+        })
+
+        if (!tenantPairMapRecord) {
+            return res.status(404).json({ message: "Tenant pair map id not found" })
+        }
+
+        const tenantPairUpdated = await TenantPairMap.update({
+            tpm_source_tenant,
+            tpm_destination_tenant,
+            tpm_is_cloning_done,
+            tpm_cloning_progress_status,
+            tpm_cloning_last_performed_on,
+            created_by,
+            modified_by
+        }, {
+            where: {
+                tpm_id: tpm_id,
+                is_deleted: false
+            }
+
+        });
+
+        if (tenantPair) {
+            return res.status(200).json({ data: tenantPairUpdated })
+        }
+
+    } catch (error) {
+        console.log('error in service fn: modifyTenantPairMap: ', error);
+    }
+}
+
+const fetchOneTenantPairMap = async (req, res) => {
+    try {
+        const tpmId = req.params.tpm_id;
+
+        const tenantPairRecord = await TenantPairMap.findOne({
+            where: {
+                is_deleted: false,
+                tpm_id: tpmId
+            },
+            include: [
+                {
+                    model: UserModel,
+                    as: "created_by_user",
+                    attributes: [
+                        "user_id",
+                        "email_id",
+                        "external_id",
+                        "first_name",
+                        "last_name",
+                        "display_name"
+                    ]
+                },
+                {
+                    model: UserModel,
+                    as: "modified_by_user",
+                    attributes: [
+                        "user_id",
+                        "email_id",
+                        "external_id",
+                        "first_name",
+                        "last_name",
+                        "display_name"
+                    ]
+                },
+                {
+                    model: Tenant,
+                    where: {
+                        is_deleted: false
+                    },
+                    as: "source_tenant",
+                    attributes: ['tenant_id', 'tenant_name', 'tenant_description']
+                },
+                {
+                    model: Tenant,
+                    where: {
+                        is_deleted: false
+                    },
+                    as: "destination_tenant",
+                    attributes: ['tenant_id', 'tenant_name', 'tenant_description']
+                }
+            ],
+            logging: (sql) => {
+                console.log(`SQL for get all tenan pair map, table: ${TenantPairMap.tableName}: `, sql);
+            }
+        })
+
+        if (!tenantPairRecord) {
+            return res.status(404).json({ error: `No data found for tenant pair id : ${tpmId}` })
+        }
+
+        return res.status(200).json({ data: tenantPairRecord })
+    } catch (error) {
+        console.log('error in service fn: fetchOneTenantPairMap: ', error);
+    }
+}
+
+const removeTenantPairMap = async (req, res) => {
+    try {
+        const tpmId = req.params.tpm_id;
+        const tenantPairRecord = await TenantPairMap.findOne({
+            where: {
+                tpm_id: tpmId,
+                is_deleted: false
+            }
+        })
+
+        if (!tenantPairRecord) {
+            return res.status(404).json({ error: `No data found for tenant pair id : ${tpmId}` })
+        }
+
+        const softDeleteTpmRecord = await TenantPairMap.update(
+            {
+                is_deleted: true
+            }, {
+            where: {
+                tpm_id: tenantPairRecord.tpm_id,
+                is_deleted: false
+            }
+        });
+
+        if (softDeleteTpmRecord) {
+            return res.status(200).json({ message: `Tpm_id: ${tpmId} deleted successfully.` })
+        }
+
+
+    } catch (error) {
+        console.log('error in service fn: removeTenantPairMap: ', error);
+    }
+}
+
+
 //----------------------------------------------------------------------------------------------//
 // Non exported functions:
 function mapToIntegrationPackage(input) {
@@ -1575,7 +1831,12 @@ module.exports = {
     createDailyTimeInterval,
     fetchAllDailyTimeInterval,
     modifyDailyTimeInterval,
-    fetchDailyTimeInterval
+    fetchDailyTimeInterval,
+    fetchAllTenantPairs,
+    createTenantPairMap,
+    modifyTenantPairMap,
+    fetchOneTenantPairMap,
+    removeTenantPairMap,
 }
 
 

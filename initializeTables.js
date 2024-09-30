@@ -24,6 +24,7 @@ const TenantPackageArtifactInfo = require('./src/models/Tenant/tenantPacakgeArti
 const TenantPackage = require('./src/models/Tenant/tenantPackage');
 const TenantArtifact = require('./src/models/Tenant/tenantArtifact');
 const DailyTimeInterval = require('./src/models/Tenant/dailyTimeInterval');
+const TenantPairMap = require('./src/models/Tenant/tenantPairMap');
 
 async function insertIfNotExists() {
   console.log('\nCreating data for taxonomy table')
@@ -62,6 +63,7 @@ async function syncModels() {
     await TenantPackage.sync({ force: false });
     await TenantArtifact.sync({ force: false });
     await DailyTimeInterval.sync({ force: false });
+    await TenantPairMap.sync({ force: false });
 
   } catch (error) {
     console.error('Error syncing models:', error);

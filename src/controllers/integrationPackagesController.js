@@ -175,6 +175,62 @@ async function getDailyTimeInterval(req, res) {
     }
 }
 
+async function getAllTenantPairMap(req, res) {
+    try {
+        await integrationPackageService.fetchAllTenantPairs(req, res);
+    } catch (error) {
+        console.log('Error message: ', error.message);
+        console.log('error: stack', error.stack);
+        console.log("\nError in function: getAllTenantPairMap");
+
+    }
+}
+
+async function postTenantPairMap(req, res) {
+    try {
+        await integrationPackageService.createTenantPairMap(req, res);
+    } catch (error) {
+        console.log('Error message: ', error.message);
+        console.log('error: stack', error.stack);
+        console.log("\nError in function: postTenantPairMap");
+
+    }
+}
+
+async function editTenantPairMap(req, res) {
+    try {
+        await integrationPackageService.modifyTenantPairMap(req, res);
+    } catch (error) {
+        console.log('Error message: ', error.message);
+        console.log('error: stack', error.stack);
+        console.log("\nError in function: editTenantPairMap");
+
+    }
+}
+
+async function getOneTenantPairMap(req, res) {
+    try {
+        await integrationPackageService.fetchOneTenantPairMap(req, res);
+    } catch (error) {
+        console.log('Error message: ', error.message);
+        console.log('error: stack', error.stack);
+        console.log("\nError in function: getOneTenantPairMap");
+
+    }
+}
+
+async function deleteOneTenantPairMap(req, res) {
+    try {
+        await integrationPackageService.removeTenantPairMap(req, res);
+    } catch (error) {
+        console.log('Error message: ', error.message);
+        console.log('error: stack', error.stack);
+        console.log("\nError in function: getDailyTimeInterval");
+
+    }
+}
+
+
 // export all the modules
 module.exports = {
     getAllPackagesList,
@@ -189,5 +245,10 @@ module.exports = {
     postDailyTimeInterval,
     getAllDailyTimeInterval,
     editDailyTimeInterval,
-    getDailyTimeInterval
+    getDailyTimeInterval,
+    getAllTenantPairMap,
+    postTenantPairMap,
+    editTenantPairMap,
+    getOneTenantPairMap,
+    deleteOneTenantPairMap
 }

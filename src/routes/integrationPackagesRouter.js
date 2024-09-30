@@ -28,7 +28,14 @@ router.route("/dailyInterval")
     .get(integrationPackage.getAllDailyTimeInterval)
     .put(integrationPackage.editDailyTimeInterval)
 
+router.route("/tenantPairMap")
+    .get(integrationPackage.getAllTenantPairMap)
+    .post(integrationPackage.postTenantPairMap)
+    .put(integrationPackage.editTenantPairMap)
 
+router.route("/tenantPairMap/:tpm_id")
+    .get(integrationPackage.getOneTenantPairMap)
+    .delete(integrationPackage.deleteOneTenantPairMap)
 
 
 // router.route('/')
