@@ -8,6 +8,7 @@ const { processFailoverJob } = require("./src/cron/failover");
 const { ensureSchema } = require('./initializeTables');
 const { schemaName } = require("./src/constants/schemaName");
 const { getPackageAndArtifactInformationForTenant } = require("./src/cron/gatherPackageArtifactInfoForTenant");
+const { clonePackagesAndArtifactsForTenantPairMap } = require("./src/cron/clonePackagesAndArtifactsForTenantPairMap");
 
 // Higher-level error handling
 (async () => {
@@ -40,9 +41,18 @@ function printTime() {
 
 setInterval(printTime, 1000);
 
+async function scheduleTenantPackageArtifactJobs() {
+  try {
+    // await getPackageAndArtifactInformationForTenant(); // Waits for this to complete
+    await clonePackagesAndArtifactsForTenantPairMap();  // Runs only after the previous function completes
+  } catch (error) {
+    console.error('Error occurred during scheduled job:', error);
+  }
+}
+
 // node-cron to perform failover processing 
 // nodeCron.schedule('* * * * *', processFailoverJob );
-nodeCron.schedule('* * * * *', getPackageAndArtifactInformationForTenant);
+nodeCron.schedule('* * * * *', scheduleTenantPackageArtifactJobs);
 
 // If the route is not found
 app.use(function (req, res, next) {

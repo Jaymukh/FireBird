@@ -22,6 +22,7 @@ const { PROCESS_STATUS } = require("../constants/taxonomyValues");
 const DailyTimeInterval = require("../models/Tenant/dailyTimeInterval");
 const UserModel = require("../models/userModel");
 const TenantPairMap = require("../models/Tenant/tenantPairMap");
+const { tenantTableColumns } = require("../constants/tableColumns");
 
 
 const baseURLTenantOne = "https://86f3b06dtrial.it-cpitrial06.cfapps.us10-001.hana.ondemand.com/api/v1";
@@ -1583,6 +1584,7 @@ const modifyTenantPairMap = async (req, res) => {
         const {
             tpm_id,
             tpm_pair_name,
+            tpm_is_pair_active,
             tpm_source_tenant,
             tpm_destination_tenant,
             tpm_is_cloning_done,
@@ -1605,6 +1607,7 @@ const modifyTenantPairMap = async (req, res) => {
 
         const tenantPairUpdated = await TenantPairMap.update({
             tpm_pair_name,
+            tpm_is_pair_active,
             tpm_source_tenant,
             tpm_destination_tenant,
             tpm_is_cloning_done,
@@ -1620,7 +1623,7 @@ const modifyTenantPairMap = async (req, res) => {
 
         });
 
-        if (tenantPair) {
+        if (tenantPairUpdated) {
             return res.status(200).json({ data: tenantPairUpdated })
         }
 
@@ -1728,7 +1731,6 @@ const removeTenantPairMap = async (req, res) => {
         console.log('error in service fn: removeTenantPairMap: ', error);
     }
 }
-
 
 //----------------------------------------------------------------------------------------------//
 // Non exported functions:
